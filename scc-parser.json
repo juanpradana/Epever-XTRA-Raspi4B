@@ -1,0 +1,381 @@
+[
+    {
+        "id": "136c3a12b5ce1183",
+        "type": "tab",
+        "label": "scc parser",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "afd9bdf9c28cd73d",
+        "type": "modbus-read",
+        "z": "136c3a12b5ce1183",
+        "name": "0x3100",
+        "topic": "",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "InputRegister",
+        "adr": "0x3100",
+        "quantity": "6",
+        "rate": "1",
+        "rateUnit": "m",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "c5199c945ade1725",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 110,
+        "y": 220,
+        "wires": [
+            [
+                "45dfa17f44d9c692"
+            ],
+            [
+                "79b676655ecc01b8"
+            ]
+        ]
+    },
+    {
+        "id": "45dfa17f44d9c692",
+        "type": "function",
+        "z": "136c3a12b5ce1183",
+        "name": "pvvoltage pvcurrent pvpower bvoltage battChargeCurrent",
+        "func": "const d = new Date();\nlet pvvoltage = msg.payload[0] / 100.0\nlet pvcurrent = msg.payload[1] / 100.0\nlet pvpower = (msg.payload[2] | msg.payload[3] << 16) / 100.0\nlet bvoltage = msg.payload[4] / 100.0\nlet battChargeCurrent = msg.payload[5] / 100.0\n\nfunction addLeadingZero(num) {\n    if (num < 10) {\n        return \"0\" + num;\n    } else {\n        return num;\n    }\n}\n\nmsg.payload = {\n    \"ts\": d.getTime(),\n    \"humanTime\": `${addLeadingZero(d.getFullYear())}/${addLeadingZero(d.getMonth() + 1)}/${d.getDate()} ${addLeadingZero(d.getHours())}:${addLeadingZero(d.getMinutes())}:${addLeadingZero(d.getSeconds())}`,\n    \"PV_Voltage\" : pvvoltage,\n    \"PV_Current\" : pvcurrent,\n    \"PV_Power\" : pvpower,\n    \"Battery_Voltage\" : bvoltage,\n    \"Battery_Charge_Current\" : battChargeCurrent\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 220,
+        "wires": [
+            [
+                "f32a2ac9e763acc7"
+            ]
+        ]
+    },
+    {
+        "id": "1a3c171df8ae4c34",
+        "type": "function",
+        "z": "136c3a12b5ce1183",
+        "name": "battChargePower",
+        "func": "let battChargePower = (msg.payload[0] | msg.payload[1] << 16) / 100.0\n\nmsg.payload = {\n    \"Battery_Charge_Power\" : battChargePower\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 280,
+        "wires": [
+            [
+                "f32a2ac9e763acc7"
+            ]
+        ]
+    },
+    {
+        "id": "eba2d363436cd71c",
+        "type": "function",
+        "z": "136c3a12b5ce1183",
+        "name": "lcurrent lpower",
+        "func": "let lcurrent = msg.payload[0] / 100.0\nlet lpower = (msg.payload[1] | msg.payload[2] << 16) / 100.0\n\nmsg.payload = {\n    \"Load_Current\" : lcurrent,\n    \"Load_Power\" : lpower\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 340,
+        "wires": [
+            [
+                "f32a2ac9e763acc7"
+            ]
+        ]
+    },
+    {
+        "id": "a8dd8ec76f52e3c9",
+        "type": "function",
+        "z": "136c3a12b5ce1183",
+        "name": "bremaining btemp",
+        "func": "let bremaining = msg.payload[0] / 1.0\nlet btemp = msg.payload[1] / 100.0\n\nmsg.payload = {\n    \"Battery_Remaining_Percentage\" : bremaining,\n    \"Battery_Temperature\" : btemp\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 400,
+        "wires": [
+            [
+                "f32a2ac9e763acc7"
+            ]
+        ]
+    },
+    {
+        "id": "9c3814d3d3c21b60",
+        "type": "function",
+        "z": "136c3a12b5ce1183",
+        "name": "battOverallCurrent",
+        "func": "let battOverallCurrent = (msg.payload[0] | msg.payload[1] << 16) / 100.0\n\nmsg.payload = {\n    \"Battery_Discharge_Current\" : battOverallCurrent\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 460,
+        "wires": [
+            [
+                "f32a2ac9e763acc7"
+            ]
+        ]
+    },
+    {
+        "id": "f32a2ac9e763acc7",
+        "type": "join",
+        "z": "136c3a12b5ce1183",
+        "name": "object merger",
+        "mode": "custom",
+        "build": "merged",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "13",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 780,
+        "y": 360,
+        "wires": [
+            [
+                "c04fee10c16d67fd",
+                "bb3be386d85161b0"
+            ]
+        ]
+    },
+    {
+        "id": "c04fee10c16d67fd",
+        "type": "debug",
+        "z": "136c3a12b5ce1183",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 960,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "4303e9addd11b587",
+        "type": "comment",
+        "z": "136c3a12b5ce1183",
+        "name": "",
+        "info": "node-red-contrib-modbus",
+        "x": 120,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "bb3be386d85161b0",
+        "type": "http request",
+        "z": "136c3a12b5ce1183",
+        "d": true,
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "body",
+        "url": "http://127.0.0.1:1880/jsonData?node=scc",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "Content-Type",
+                "valueType": "other",
+                "valueValue": "application/json"
+            }
+        ],
+        "credentials": {},
+        "x": 970,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "79b676655ecc01b8",
+        "type": "modbus-getter",
+        "z": "136c3a12b5ce1183",
+        "name": "0x3106",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "logIOActivities": false,
+        "unitid": "1",
+        "dataType": "InputRegister",
+        "adr": "0x3106",
+        "quantity": "2",
+        "server": "c5199c945ade1725",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "x": 120,
+        "y": 280,
+        "wires": [
+            [
+                "1a3c171df8ae4c34"
+            ],
+            [
+                "5bb854aaa4e0aece"
+            ]
+        ]
+    },
+    {
+        "id": "5bb854aaa4e0aece",
+        "type": "modbus-getter",
+        "z": "136c3a12b5ce1183",
+        "name": "0x310D",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "logIOActivities": false,
+        "unitid": "1",
+        "dataType": "InputRegister",
+        "adr": "0x310D",
+        "quantity": "3",
+        "server": "c5199c945ade1725",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "x": 120,
+        "y": 340,
+        "wires": [
+            [
+                "eba2d363436cd71c"
+            ],
+            [
+                "707435658efcbc44"
+            ]
+        ]
+    },
+    {
+        "id": "707435658efcbc44",
+        "type": "modbus-getter",
+        "z": "136c3a12b5ce1183",
+        "name": "0x311A",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "logIOActivities": false,
+        "unitid": "1",
+        "dataType": "InputRegister",
+        "adr": "0x311A",
+        "quantity": "2",
+        "server": "c5199c945ade1725",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "x": 120,
+        "y": 400,
+        "wires": [
+            [
+                "a8dd8ec76f52e3c9"
+            ],
+            [
+                "3dca1f50d44b049a"
+            ]
+        ]
+    },
+    {
+        "id": "3dca1f50d44b049a",
+        "type": "modbus-getter",
+        "z": "136c3a12b5ce1183",
+        "name": "0x331B",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "logIOActivities": false,
+        "unitid": "1",
+        "dataType": "InputRegister",
+        "adr": "0x331B",
+        "quantity": "2",
+        "server": "c5199c945ade1725",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "x": 120,
+        "y": 460,
+        "wires": [
+            [
+                "9c3814d3d3c21b60"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c5199c945ade1725",
+        "type": "modbus-client",
+        "name": "serial",
+        "clienttype": "simpleser",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "failureLogEnabled": true,
+        "tcpHost": "127.0.0.1",
+        "tcpPort": "502",
+        "tcpType": "DEFAULT",
+        "serialPort": "/dev/ttyAMA0",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": "115200",
+        "serialDatabits": "8",
+        "serialStopbits": "1",
+        "serialParity": "none",
+        "serialConnectionDelay": "100",
+        "serialAsciiResponseStartDelimiter": "0x3A",
+        "unit_id": 1,
+        "commandDelay": 1,
+        "clientTimeout": 5000,
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": 0,
+        "parallelUnitIdsAllowed": true,
+        "showWarnings": true,
+        "showLogs": true
+    }
+]
