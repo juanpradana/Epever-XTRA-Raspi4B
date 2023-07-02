@@ -12,18 +12,20 @@ This repository explain how to parse data from epever solar charge controller us
 ## Diagram
 - Wiring
 
-![diagrams](https://github.com/juanpradana/Epever-XTRA-Raspi4B/assets/30497994/b06ab6ee-c481-45c1-8e22-9d4e5531e7e0)
+![Diagrams](https://github.com/juanpradana/Epever-XTRA-Raspi4B/assets/30497994/a84579c5-80cb-4d8f-a062-85d8553f0c59)
+
 
 - Device
 
-(not available)
+![device](https://github.com/juanpradana/Epever-XTRA-Raspi4B/assets/30497994/8515a22a-21ff-4126-a87e-d094acb115cb)
+
 
 ## Wire
 - Raspi to rs485 module
 
 | Raspi | 2 Way RS485 to TTL |
 | --- | --- |
-| Pin 2 | VCC |
+| Pin 4 | VCC |
 | Pin 6 | GND |
 | Pin 10 | RX |
 | Pin 8 | TX |
