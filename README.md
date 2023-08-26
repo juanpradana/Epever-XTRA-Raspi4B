@@ -64,6 +64,10 @@ This repository explain how to parse data from epever solar charge controller us
 
   ![image](https://github.com/juanpradana/Epever-XTRA-Raspi4B/assets/30497994/5bd05413-254d-4c4a-9f5b-3536e633da2f)
 
+- Set serial configuration
+
+  ![image](https://github.com/juanpradana/Epever-XTRA-Raspi4B/assets/30497994/6cb3eb10-2d8d-4eb1-ac3c-7439dab527a6)
+
 - Assemble all the components (raspi, rs485 converter and scc)
 
 ## Result
